@@ -1,0 +1,29 @@
+{
+  "name": "couchdb_bulkdoc_saver",
+  "version": "0.0.1",
+  "description": "utility to smooth over saving bulkdocs to couchdb.  it will check _rev for you",
+  "main": "bulkdoc_saver.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "superagent": ""
+  },
+  "devDependencies": {
+    "lodash": "",
+    "should": ""
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmarca/coucdb_bulkdoc_saver"
+  },
+  "keywords": [
+    "couchdb",
+    "bulkdocs"
+  ],
+  "author": "James E. Marca",
+  "license": "MIT"
+}
