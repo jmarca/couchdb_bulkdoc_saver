@@ -25,13 +25,23 @@ Generally this will work fine, but if you've set up CouchDB to require
 valid users, then you need to set the CouchDB user and password
 properly.
 
-I'm open to other ways to supply these values, but at the moment I'm
-using only this because I am lazy.
-
+```javascript
 var cuser = env.COUCHDB_USER ;
 var cpass = env.COUCHDB_PASS ;
 var chost = env.COUCHDB_HOST || '127.0.0.1';
 var cport = env.COUCHDB_PORT || 5984;
+```
+
+An alternate way to specify these things is through options when you
+create the saver, as follows:
+
+```javascript
+var saver = make_bulkdoc_saver(cdb,
+                   {user:'usename',
+                    pass:'password',
+                    host:'http://127.0.0.1',
+                    port:5984}
+```
 
 
 Sample usage:

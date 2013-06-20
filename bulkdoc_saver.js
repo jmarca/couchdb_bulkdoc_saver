@@ -1,12 +1,11 @@
 var _ = require('lodash')
 var superagent = require('superagent')
 var env = process.env
-var cuser = env.COUCHDB_USER
-var cpass = env.COUCHDB_PASS
-var chost = env.COUCHDB_HOST  || '127.0.0.1'
-var cport = env.COUCHDB_PORT || 5984
+var _cuser = env.COUCHDB_USER
+var _cpass = env.COUCHDB_PASS
+var _chost = env.COUCHDB_HOST  || '127.0.0.1'
+var _cport = env.COUCHDB_PORT || 5984
 
-var couch = 'http://'+chost+':'+cport
 
 /**
  * make_bulkdoc_saver
@@ -40,7 +39,13 @@ var couch = 'http://'+chost+':'+cport
  *
  */
 
-function  make_bulkdoc_saver(cdb){
+function  make_bulkdoc_saver(cdb,opts){
+    if(!opts) opts = {}
+    var cuser =  opts.user || _cuser
+    var cpass =  opts.pass || _cpass
+    var chost =  opts.host || _chost
+    var cport =  opts.port || _cport
+    var couch = 'http://'+chost+':'+cport
 
     return function(docs,next){
         if(next===undefined) next = function(){}
