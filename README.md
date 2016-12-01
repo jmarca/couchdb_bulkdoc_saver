@@ -1,5 +1,37 @@
-
 # couchdb_bulkdoc_saver
+
+## Refactor December 2016
+
+now uses the newer config.json approach to configuring.
+
+To run the tests, make sure you have a file called test.config.json
+that contains at a minimum:
+
+```
+{
+    "couchdb": {
+        "host": "127.0.0.1",
+        "port":5984,
+        "auth":{"username":"mycdbuser",
+                "password":"mycdbpass"
+               }
+    }
+}
+```
+
+where `mycdbuser` is the real couchdb username, and `mycdbpass` is the
+real couchdb password.
+
+
+Ditto when running the code as a library.
+
+
+
+Most of what is below is wrong at this time.  Check the test for
+correct usage.
+
+# Deprecated readme I'm too lazy to rewrite right now
+
 
 This is a utility to help out saving docs to couchdb when those docs
 might be updating existing docs.
