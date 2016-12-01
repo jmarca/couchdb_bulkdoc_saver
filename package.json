@@ -1,16 +1,18 @@
 {
   "name": "couchdb_bulkdoc_saver",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "utility to smooth over saving bulkdocs to couchdb.  it will check _rev for you",
   "main": "bulkdoc_saver.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
+    "config_okay": "0.0.3",
     "superagent": ""
   },
   "devDependencies": {
     "lodash": "",
+    "mocha": "^2.5.3",
     "should": ""
   },
   "scripts": {
