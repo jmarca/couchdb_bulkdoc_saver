@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "lodash": "",
-    "mocha": "^2.5.3",
+    "mocha": "^3.4.1",
     "should": ""
   },
   "scripts": {

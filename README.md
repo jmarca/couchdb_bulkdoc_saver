@@ -1,5 +1,7 @@
 # couchdb_bulkdoc_saver
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jmarca/couchdb_bulkdoc_saver.svg)](https://greenkeeper.io/)
+
 ## Refactor December 2016
 
 now uses the newer config.json approach to configuring.
