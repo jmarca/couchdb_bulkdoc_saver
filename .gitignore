@@ -2,3 +2,5 @@
 .tern-port
 node_modules
 test.config.json
+.nyc_output
+coverage

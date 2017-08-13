@@ -1,4 +1,3 @@
-var _ = require('lodash')
 var superagent = require('superagent')
 var config={'couchdb':{}}
 var config_okay = require('config_okay')
@@ -37,89 +36,119 @@ function bulkdoc_saver(opts,cb){
     return _bulkdoc_saver(opts,cb)
 }
 
-function  _bulkdoc_saver(opts,cb){
-    var c = {},cdb,cport,cuser,cpass,db,uri_root,docs
-    var hash = {}
-    var keys = []
-    _.assign(c,config.couchdb,opts)
-
-    db = c.db
-    if(opts.couchdb !== undefined){
-        throw new Error('hey, you are using an old way of doing this')
+function cb_or_promise( cb, req ) {
+    if(!cb || cb === undefined){
+        return req // send back the promise object
+    }else{
+        // wait here for promise object
+        req.then(res =>{
+            return cb(null,res)
+        }).catch(e =>{
+            return cb(e)
+        })
+        return null
     }
-    cdb = c.host || '127.0.0.1'
-    cport = c.port || 5984
-    cdb = cdb+':'+cport
+}
+
+function get_query(c){
+    const db = c.db
+    if(db === undefined ){
+        throw('db is required in options object under \'db\' key')
+    }
+    const cport = c.port || 5984
+    const host = c.host || '127.0.0.1'
+    let cdb = host+':'+cport
     if(! /http/.test(cdb)){
         cdb = 'http://'+cdb
     }
-    if(config.couchdb.auth !== undefined){
-        cuser = config.couchdb.auth.username
-        cpass = config.couchdb.auth.password
+    return cdb+'/'+db
+}
+const  auth_check = (r,opts)=>{
+    if(opts.auth.username && opts.auth.password){
+        r.auth(opts.auth.username,opts.auth.password)
     }
+    return r
+}
 
-    uri_root = cdb +'/' + db
-    docs = opts.docs
+
+const all_docs_handler =  (hash) =>{
+
+    return (response) =>{
+        return response.body.rows.map( row => {
+            if(row.error==='not_found') return hash[row.key]
+            if(row.error) throw new Error(row.error)
+            hash[row.id]._rev = row.value.rev;
+            return hash[row.id]
+        })
+
+    }
+}
+
+const submit_all_docs = async (opts,docs) => {
+    const cdb = get_query(opts)
+    const uri = cdb+ '/_all_docs';
+    const keys = []
+    const hash = []
+    docs.forEach((doc)=>{
+        hash[doc._id] = doc
+        if(doc._rev === undefined){
+            keys.push( doc._id )
+        }
+        return null
+    })
+    if(keys.length > 0){
+        const handler = all_docs_handler(hash)
+        const req = superagent.post(uri)
+              .type('json')
+              .set('accept','application/json')
+        auth_check(req,opts)
+        //req.send({'include_docs':true})
+        req.send({'keys':keys})
+        const r = await req
+        const handler_docs = handler(r)
+        return handler_docs
+    }else{
+        return docs
+    }
+}
+
+const submit_bulk_docs = async (opts, docs) => {
+    const cdb = get_query(opts)
+    var req2 = superagent.post( cdb + '/_bulk_docs' )
+        .type('json')
+        .set('accept','application/json')
+    auth_check(req2,opts)
+    req2.send({'docs':docs})
+    const r = await req2
+    return r.body
+}
+
+
+async function  _bulkdoc_saver(opts,cb){
+    if(opts.couchdb !== undefined){
+        throw new Error('hey, you are using an old way of doing this')
+    }
+    let docs = opts.docs
     if (docs === undefined) {
         throw new Error ('docs must be defined as a field in the config object')
     }
     if(docs.docs !== undefined){
+        // sometimes put "docs" under "docs"
         docs = docs.docs
     }
-    // so now docs is just an array
-    _.map(docs
-          ,function(doc){
-              hash[doc._id] = doc
-              if(doc._rev === undefined){
-                  keys.push( doc._id )
-              }
-              return null
-          });
+    // so now docs is just an array, not an object
 
-    if(keys.length > 0){
-        var req = superagent.post(uri_root + '/_all_docs')
-            .type('json')
-            .set('accept','application/json')
-        if(cuser && cpass){
-            req.auth(cuser,cpass)
-        }
-        req.send({'keys':keys})
-        req.end(function(e,r){
-            if(e) return cb(e);
-            // now add the revisions to the docs and save updates
-            var result = r.body
-            var revdocs = _.map(result.rows
-                                ,function(row){
-                                    if(row.error==='not_found') return hash[row.key]
-                                    if(row.error) throw new Error(row.error)
-                                    hash[row.id]._rev = row.value.rev;
-                                    return hash[row.id]
-                                });
-            bulker(revdocs,uri_root,cuser,cpass,cb)
-            return null
-        })
-        return null
-    }else{
-        bulker(docs,uri_root,cuser,cpass,cb)
-    }
-    return null
+    let  c = {}
+    // ,cdb,cport,cuser,cpass,db,uri_root,docs
+    Object.assign(c,config.couchdb,opts)
+    const query = get_query(c)
+
+
+    const revdocs = await submit_all_docs(opts,docs)
+    const req = submit_bulk_docs(opts,revdocs)
+    return cb_or_promise(cb,req)
+
 }
 
-function bulker (docs,uri_root,cuser,cpass,cb){
-    var req2 = superagent.post( uri_root + '/_bulk_docs' )
-        .type('json')
-        .set('accept','application/json')
-    if(cuser && cpass){
-        req2.auth(cuser,cpass)
-    }
-    req2.send({'docs':docs})
-    req2.end(function(e,r){
-        if(e){ console.log('bulk doc save error '+e)
-               return cb(e)
-             }
-        return cb(null,r.body)
-    })
-    return null
-}
 
 module.exports=bulkdoc_saver
