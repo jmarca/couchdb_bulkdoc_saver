@@ -11,7 +11,7 @@
     "superagent": "^5.1.0"
   },
   "devDependencies": {
-    "tap": "^14.10.5"
+    "tap": "^14.10.6"
   },
   "scripts": {
     "test": "tap test/**/test*.js --cov",
