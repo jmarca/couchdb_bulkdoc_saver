@@ -1,6 +1,6 @@
 # couchdb_bulkdoc_saver
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/jmarca/couchdb_bulkdoc_saver.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/jmarca/couchdb_bulkdoc_saver.svg?branch=master)](https://travis-ci.org/jmarca/couchdb_bulkdoc_saver)
 [![Build Status](https://travis-ci.org/jmarca/couchdb_bulkdoc_saver.svg?branch=master)](https://travis-ci.org/jmarca/couchdb_bulkdoc_saver)
 [![Test Coverage](https://codeclimate.com/github/jmarca/couchdb_bulkdoc_saver/badges/coverage.svg)](https://codeclimate.com/github/jmarca/couchdb_bulkdoc_saver/coverage)
